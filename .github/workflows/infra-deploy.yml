@@ -1,0 +1,42 @@
+name: Infra Deploy
+
+on:
+  pull_request:
+    paths:
+      - "terraform/**"
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**"
+  workflow_dispatch: {}
+
+jobs:
+  plan:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/terraform-deploy-template.yml
+    with:
+      environment: dev
+      working_directory: terraform/environments/dev
+      aws_region: us-east-1
+      apply: false
+      repo_url: ${{ vars.APP_REPO_URL }}
+      repo_ref: main
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
+
+  apply:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/terraform-deploy-template.yml
+    with:
+      environment: dev
+      working_directory: terraform/environments/dev
+      aws_region: us-east-1
+      apply: true
+      repo_url: ${{ vars.APP_REPO_URL }}
+      repo_ref: main
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}

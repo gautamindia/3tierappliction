@@ -1,0 +1,42 @@
+name: App Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Deploy just one tier, or leave as 'both'"
+        type: choice
+        options: [both, frontend, backend]
+        default: both
+
+jobs:
+  deploy-backend:
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.tier == 'both' || github.event.inputs.tier == 'backend' }}
+    uses: ./.github/workflows/app-deploy-template.yml
+    with:
+      environment: dev
+      tier: backend
+      project_tag: threetier
+      aws_region: us-east-1
+      repo_url: ${{ vars.APP_REPO_URL }}
+      repo_ref: main
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+
+  deploy-frontend:
+    needs: deploy-backend
+    if: ${{ always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.tier == 'both' || github.event.inputs.tier == 'frontend') }}
+    uses: ./.github/workflows/app-deploy-template.yml
+    with:
+      environment: dev
+      tier: frontend
+      project_tag: threetier
+      aws_region: us-east-1
+      repo_url: ${{ vars.APP_REPO_URL }}
+      repo_ref: main
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}

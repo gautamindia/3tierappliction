@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>3-Tier Demo App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 720px; margin: 40px auto; color: #222; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    form { margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    input { padding: 6px; }
+    .flash-success { color: #0a7a2f; }
+    .flash-error { color: #b00020; }
+    .error-banner { background: #fdecea; border: 1px solid #f5c2c0; padding: 10px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>3-Tier Demo App</h1>
+  <p>Frontend tier &rarr; Backend tier (business logic) &rarr; RDS database</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <p class="flash-{{ category }}">{{ message }}</p>
+    {% endfor %}
+  {% endwith %}
+
+  {% if error %}
+    <div class="error-banner">{{ error }}</div>
+  {% endif %}
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Base Price</th>
+        <th>Quantity</th>
+        <th>Total (after bulk discount)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.base_price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.total_price }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No items yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <form action="{{ url_for('add_item') }}" method="post">
+    <input type="text" name="name" placeholder="Item name" required>
+    <input type="number" step="0.01" name="base_price" placeholder="Base price" required>
+    <input type="number" name="quantity" placeholder="Quantity" value="1" min="1">
+    <button type="submit">Add item</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,100 @@
+name: Terraform Deploy (reusable)
+
+# Reusable workflow: plans (and optionally applies) the Terraform in
+# terraform/environments/<env>. Called by infra-deploy.yml (and any future
+# per-environment caller) via `workflow_call`.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "GitHub Environment to run against (e.g. dev, staging, prod). Used for approvals/protection rules."
+        required: true
+        type: string
+      working_directory:
+        description: "Path to the Terraform root module"
+        required: false
+        type: string
+        default: "terraform/environments/dev"
+      aws_region:
+        required: false
+        type: string
+        default: "us-east-1"
+      apply:
+        description: "If true, apply after a successful plan. If false, plan only (e.g. for pull requests)."
+        required: false
+        type: boolean
+        default: false
+      repo_url:
+        description: "Git URL used as TF_VAR_repo_url so bootstrapped instances know where to clone the app from"
+        required: true
+        type: string
+      repo_ref:
+        required: false
+        type: string
+        default: "main"
+    secrets:
+      AWS_ROLE_ARN:
+        description: "IAM role ARN assumed via OIDC to run Terraform"
+        required: true
+      DB_PASSWORD:
+        required: true
+      FLASK_SECRET_KEY:
+        required: true
+
+permissions:
+  id-token: write   # required for OIDC -> AWS
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    env:
+      TF_VAR_repo_url: ${{ inputs.repo_url }}
+      TF_VAR_repo_ref: ${{ inputs.repo_ref }}
+      TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+      TF_VAR_flask_secret_key: ${{ secrets.FLASK_SECRET_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.5"
+
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ inputs.environment }}
+          path: ${{ inputs.working_directory }}/tfplan
+          retention-days: 5
+
+      - name: Terraform apply
+        if: ${{ inputs.apply == true }}
+        run: terraform apply -input=false -auto-approve tfplan

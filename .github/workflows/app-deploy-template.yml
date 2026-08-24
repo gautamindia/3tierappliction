@@ -1,0 +1,119 @@
+name: App Deploy (reusable)
+
+# Reusable workflow: deploys application code (frontend or backend) onto the
+# already-provisioned EC2 instance for that tier, using AWS Systems Manager
+# Run Command -- no SSH keys or open port 22 needed. The target instance is
+# found by its `Project`/`Tier` tags, so this pipeline is fully decoupled
+# from the Terraform infra pipeline; it just needs infra to already exist.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      tier:
+        description: "Which tier to deploy: frontend or backend"
+        required: true
+        type: string
+      project_tag:
+        description: "Value of the Project tag Terraform set on the instances"
+        required: false
+        type: string
+        default: "threetier"
+      aws_region:
+        required: false
+        type: string
+        default: "us-east-1"
+      repo_url:
+        required: true
+        type: string
+      repo_ref:
+        required: false
+        type: string
+        default: "main"
+    secrets:
+      AWS_ROLE_ARN:
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.tier }} (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Find target instance
+        id: find
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters \
+              "Name=tag:Project,Values=${{ inputs.project_tag }}" \
+              "Name=tag:Tier,Values=${{ inputs.tier }}" \
+              "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].InstanceId" \
+            --output text)
+
+          if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" = "None" ]; then
+            echo "No running instance found for tier=${{ inputs.tier }}" >&2
+            exit 1
+          fi
+          echo "instance_id=$INSTANCE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy via SSM Run Command
+        run: |
+          RAW_BASE=$(echo "${{ inputs.repo_url }}" \
+            | sed -E 's#https://github.com/([^/]+)/([^/.]+)(\.git)?#https://raw.githubusercontent.com/\1/\2#')
+          DEPLOY_SCRIPT_URL="$RAW_BASE/${{ inputs.repo_ref }}/app/${{ inputs.tier }}/deploy.sh"
+
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "${{ steps.find.outputs.instance_id }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy ${{ inputs.tier }} from ${{ inputs.repo_ref }}" \
+            --parameters commands="[
+              \"set -e\",
+              \"curl -fsSL $DEPLOY_SCRIPT_URL -o /tmp/deploy.sh\",
+              \"chmod +x /tmp/deploy.sh\",
+              \"REPO_URL='${{ inputs.repo_url }}' REPO_REF='${{ inputs.repo_ref }}' /tmp/deploy.sh\"
+            ]" \
+            --query "Command.CommandId" --output text)
+
+          echo "Waiting for command $COMMAND_ID to finish..."
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ steps.find.outputs.instance_id }}" || true
+
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ steps.find.outputs.instance_id }}" \
+            --query "Status" --output text)
+
+          echo "--- stdout ---"
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ steps.find.outputs.instance_id }}" \
+            --query "StandardOutputContent" --output text
+
+          echo "--- stderr ---"
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ steps.find.outputs.instance_id }}" \
+            --query "StandardErrorContent" --output text
+
+          if [ "$STATUS" != "Success" ]; then
+            echo "SSM command finished with status $STATUS" >&2
+            exit 1
+          fi
+
+      - name: Health check
+        if: ${{ inputs.tier == 'frontend' }}
+        run: echo "Deployed. Check the app at the frontend's public IP (see Terraform output frontend_public_ip)."
