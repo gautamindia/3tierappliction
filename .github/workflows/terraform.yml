@@ -28,18 +28,20 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
-
-      - name: Terraform dir
-        run: cd terraform/environments/dev
+      
 
       - name: Terraform init
         run: terraform init
+        working-directory: ./terraform/environments/dev
+
 
       - name: Terraform validate
         run: terraform validate
+        working-directory: ./terraform/environments/dev
 
       - name: Terraform plan
         run: terraform plan -out=tfplan
+        working-directory: ./terraform/environments/dev
 
       - name: Manual Approval
         uses: trstringer/manual-approval@v1
@@ -52,3 +54,4 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve tfplan
+        working-directory: ./terraform/environments/dev
