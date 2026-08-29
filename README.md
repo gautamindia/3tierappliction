@@ -9,7 +9,7 @@ Internet
 ┌─────────────────┐   peering    ┌─────────────────┐   peering    ┌─────────────────┐
 │  Frontend VPC    │◄────────────►│  Backend VPC     │◄────────────►│  Database VPC    │
 │  10.0.0.0/16     │  :5000 only  │  10.1.0.0/16     │  :5432 only  │  10.2.0.0/16     │
-│  EC2 (Flask UI)  │              │  EC2 (Flask API) │              │  RDS (Postgres)  │
+│  EC2 (Flaska UI)  │              │  EC2 (Flask API) │              │  RDS (Postgres)  │
 └─────────────────┘              └─────────────────┘              └─────────────────┘
                                                                      (private subnets,
                                                                       no route to FE)
