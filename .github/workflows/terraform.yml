@@ -40,7 +40,7 @@ jobs:
         working-directory: ./terraform/environments/dev
 
       - name: Terraform plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -var-file="terraform.tfvars.example" -out=tfplan
         working-directory: ./terraform/environments/dev
 
       - name: Manual Approval
@@ -53,5 +53,5 @@ jobs:
           issue-body: "Please review the Terraform plan in the workflow run and comment `approve` or `deny`.\n\nWorkflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Terraform apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -var-file="terraform.tfvars.example" -auto-approve tfplan
         working-directory: ./terraform/environments/dev
