@@ -29,6 +29,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
 
+      - name: Terraform dir
+        run: cd terraform/environments/dev
+
       - name: Terraform init
         run: terraform init
 
