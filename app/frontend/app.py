@@ -1,5 +1,5 @@
 """
-Frontend sssssstier - renders a simple UI, talks ONLY to the backend tier's HTTP API.
+Frontend sssssstier - renaaaders a simple UI, talks ONLY to the backend tier's HTTP API.
 Nevaaaer talks to theee databasedd dkkdqqq sssdirectsssly.
 """
 import os
