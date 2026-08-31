@@ -233,14 +233,7 @@ module "backend_ec2" {
   associate_public_ip     = true
   key_name                = var.key_name
 
-  user_data = base64encode(templatefile("${path.module}/templates/backend_bootstrap.sh.tpl", {
-    db_host     = module.rds.address
-    db_port     = module.rds.port
-    db_name     = var.db_name
-    db_user     = var.db_username
-    db_password = var.db_password
-    repo_url    = var.repo_url
-  }))
+  
 
   extra_tags = { Tier = "backend" }
   tags       = local.tags
@@ -256,11 +249,6 @@ module "frontend_ec2" {
   associate_public_ip     = true
   key_name                = var.key_name
 
-  user_data = base64encode(templatefile("${path.module}/templates/frontend_bootstrap.sh.tpl", {
-    backend_private_ip = module.backend_ec2.private_ip
-    flask_secret_key   = var.flask_secret_key
-    repo_url            = var.repo_url
-  }))
 
   extra_tags = { Tier = "frontend" }
   tags       = local.tags
