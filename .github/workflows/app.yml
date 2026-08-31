@@ -55,6 +55,8 @@ jobs:
             EOF
             
             chmod 600 /opt/app/backend/.env
+            sudo dnf update -y
+            sudo dnf install -y python3 python3-pip git
             git clone https://github.com/gautamindia/3tierappliction.git
             cp -f /home/ec2-user/3tierappliction/app/backend/requirements.txt /opt/app/backend/requirements.txt
             cp -f /home/ec2-user/3tierappliction/app/backend/app.py /opt/app/backend/app.py
@@ -63,8 +65,7 @@ jobs:
             set -a
             source .env
             set +a
-            sudo dnf update -y
-            sudo dnf install -y python3 python3-pip git
+            
             python3 -m venv venv
             source venv/bin/activate
             pip install -r requirements.txt
