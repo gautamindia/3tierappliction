@@ -68,4 +68,14 @@ jobs:
           echo "BACKEND_PRIVATE_IP=$BACKEND_PRIVATE_IP" >> "$GITHUB_ENV"
           echo "BACKEND_PUBLIC_IP=$BACKEND_PUBLIC_IP" >> "$GITHUB_ENV"
           echo "FRONTEND_PUBLIC_IP=$FRONTEND_PUBLIC_IP" >> "$GITHUB_ENV"
+        working-directory: ./terraform/environments/dev
+      - name: Set GitHub secrets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh secret set DB_HOST --body "$DB_HOST"
+          gh secret set DB_PORT --body "$DB_PORT"
+          gh secret set BACKEND_PRIVATE_IP --body "$BACKEND_PRIVATE_IP"
+          gh secret set BACKEND_PUBLIC_IP --body "$BACKEND_PUBLIC_IP"
+          gh secret set FRONTEND_PUBLIC_IP --body "$FRONTEND_PUBLIC_IP"    
         working-directory: ./terraform/environments/dev  
