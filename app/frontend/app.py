@@ -1,6 +1,6 @@
 """
 Frontend sssssstier - renders a simple UI, talks ONLY to the backend tier's HTTP API.
-Never talks to theee databasedd dkkdqqq sssdirectsssly.
+Nevaaaer talks to theee databasedd dkkdqqq sssdirectsssly.
 """
 import os
 import logging
