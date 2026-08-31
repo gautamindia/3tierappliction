@@ -72,4 +72,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: terraform-outputs
-          path: terraform/terraform-outputs.json 
+          path: terraform/environments/dev/terraform-outputs.json 
