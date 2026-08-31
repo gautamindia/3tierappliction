@@ -71,7 +71,7 @@ jobs:
           script: |
             cat > /opt/app/frontend/.env <<EOF
             BACKEND_PRIVATE_IP=${{env.BACKEND_PRIVATE_IP}}
-            FLASK_SECRET_KEY=${{secrets.FLASK_SECRET_KE}}
+            FLASK_SECRET_KEY=${{secrets.FLASK_SECRET_KEY}}
             REPO_URL=${{secrets.REPO_URL}}
             EOF
             chmod 600 /opt/app/frontend/.env
