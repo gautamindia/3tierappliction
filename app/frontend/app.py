@@ -1,6 +1,6 @@
 """
 Frontend sssssstier -dddd renaaaders a sFFFimple UI, talks OaaaNLY to the backend tier's HTTP API.
-Nevaaaer taggglks to theee databasedd dkkdqqq sssdirectsssly.
+Nevaaaer taggglks to theee databasedd dkkdqqq sssdirectssslFFFy.
 """
 import os
 import logging

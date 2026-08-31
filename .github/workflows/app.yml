@@ -85,10 +85,21 @@ jobs:
             FLASK_SECRET_KEY=${{secrets.FLASK_SECRET_KEY}}
             REPO_URL=${{secrets.REPO_URL}}
             EOF
+            <<EOF
             chmod 600 /opt/app/frontend/.env
+            sudo dnf update -y
+            sudo dnf install -y python3 python3-pip git
+            git clone https://github.com/gautamindia/3tierappliction.git
+            cp -f /home/ec2-user/3tierappliction/app/frontend/requirements.txt /opt/app/frontend/requirements.txt
+            cp -f /home/ec2-user/3tierappliction/app/frontend/app.py /opt/app/frontend/app.py
+            cp -f /home/ec2-user/3tierappliction/app/frontend/templates/index.html /opt/app/frontend/templates/index.html
+            rm -rf 3tierappliction
             cd /opt/app/frontend
             set -a
             source .env
             set +a
-            sudo chmod +x deploy.sh
-            ./deploy.sh
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python3 app.py
+            EOF
