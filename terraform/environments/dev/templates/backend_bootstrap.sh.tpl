@@ -10,7 +10,15 @@ dnf install -y git python3 python3-pip rsync
 mkdir -p /opt/app/backend
 chown ec2-user:ec2-user /opt/app/backend
 
-
+cat > /opt/app/backend/.env << ENVEOF
+DB_HOST=${db_host}
+DB_PORT=${db_port}
+DB_NAME=${db_name}
+DB_USER=${db_user}
+DB_PASSWORD=${db_password}
+ENVEOF
+chown ec2-user:ec2-user /opt/app/backend/.env
+chmod 600 /opt/app/backend/.env
 
 sudo -u ec2-user git clone "${repo_url}" /tmp/repo-backend
 cp -r /tmp/repo-backend/app/backend/. /opt/app/backend/
