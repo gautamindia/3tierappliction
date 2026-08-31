@@ -25,7 +25,7 @@ jobs:
       # -----------------------------
       - name: Load Terraform outputs
         run: |
-          DB_PORT=$(jq -r '.db_port.value' terraform-outputs/terraform-outputs.json)
+          DB_PORT=$(jq -r '.db_port.value' terraform-outputs.json)
           DB_HOST=$(jq -r '.db_host.value' terraform-outputs/terraform-outputs.json)
           BACKEND_PRIVATE_IP=$(jq -r '.backend_private_ip.value' terraform-outputs/terraform-outputs.json)
           BACKEND_PUBLIC_IP=$(jq -r '.backend_public_ip.value' terraform-outputs/terraform-outputs.json)
