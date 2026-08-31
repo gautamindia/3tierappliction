@@ -12,7 +12,7 @@ if [ ! -d "$APP_DIR/.git" ]; then
   sudo mkdir -p "$APP_DIR"
   sudo chown ec2-user:ec2-user "$APP_DIR"
   git clone "$REPO_URL" /tmp/repo-backend
-  cp -r /tmp/repo-backend/app/backend/. "$APP_DIR"
+  sudo cp -r /tmp/repo-backend/app/backend/. "$APP_DIR"
   rm -rf /tmp/repo-backend
   cd "$APP_DIR"
   git init -q
