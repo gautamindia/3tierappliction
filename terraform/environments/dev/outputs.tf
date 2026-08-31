@@ -32,3 +32,14 @@ output "backend_vpc_id" {
 output "database_vpc_id" {
   value = module.database_vpc.vpc_id
 }
+output "db_port" {
+  value = module.rds.port
+}
+output "db_host" {
+  value = module.rds.address
+}
+
+output "backend_public_ip" {
+  description = "Browse to this IP to use the app"
+  value       = module.backend_ec2.public_ip
+}

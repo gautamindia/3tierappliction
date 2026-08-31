@@ -96,7 +96,7 @@ module "frontend_sg" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = [var.admin_cidr]
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 
@@ -147,7 +147,7 @@ module "backend_sg" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = [var.admin_cidr]
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 

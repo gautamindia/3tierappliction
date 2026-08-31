@@ -1,6 +1,6 @@
 aws_region  = "us-east-1"
 project     = "threetier"
-admin_cidr  = "192.168.29.17/32" # replace with your own IP/32
+
 
 repo_url = "https://github.com/gautamindia/3tierappliction.git"
 repo_ref = "main"

@@ -55,3 +55,17 @@ jobs:
       - name: Terraform apply
         run: terraform apply -var-file="terraform.tfvars.example" -auto-approve tfplan
         working-directory: ./terraform/environments/dev
+      - name: Get Terraform outputs
+        run: |
+          DB_PORT=$(terraform output -raw db_port)
+          DB_HOST=$(terraform output -raw db_host)
+          BACKEND_PRIVATE_IP=$(terraform output -raw backend_private_ip)
+          BACKEND_PUBLIC_IP=$(terraform output -raw backend_public_ip)
+          FRONTEND_PUBLIC_IP=$(terraform output -raw frontend_public_ip)
+
+          echo "DB_PORT=$DB_PORT" >> "$GITHUB_ENV"
+          echo "DB_HOST=$DB_HOST" >> "$GITHUB_ENV"
+          echo "BACKEND_PRIVATE_IP=$BACKEND_PRIVATE_IP" >> "$GITHUB_ENV"
+          echo "BACKEND_PUBLIC_IP=$BACKEND_PUBLIC_IP" >> "$GITHUB_ENV"
+          echo "FRONTEND_PUBLIC_IP=$FRONTEND_PUBLIC_IP" >> "$GITHUB_ENV"
+        working-directory: ./terraform/environments/dev  

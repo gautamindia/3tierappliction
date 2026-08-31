@@ -8,11 +8,7 @@ variable "project" {
   default = "threetier"
 }
 
-variable "admin_cidr" {
-  description = "CIDR allowed to SSH into instances for emergency/manual access. Restrict this to your own IP."
-  type        = string
-  default     = "0.0.0.0/0" # override in tfvars for real use
-}
+
 
 # --- VPC / subnet CIDRs ---
 variable "frontend_vpc_cidr" {
