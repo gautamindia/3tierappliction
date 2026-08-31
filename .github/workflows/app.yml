@@ -54,13 +54,13 @@ jobs:
             REPO_URL=${{secrets.REPO_URL}}
             EOF
             
-            chmod 600 /opt/app/backend/.env
-            cd /opt/app/backend
+            chmod 600 /opt/app/frontend/.env
+            cd /opt/app/frontend
             set -a
             source .env
             set +a
             sudo chmod +x deploy.sh
-            ./deploy.sh
+            sudo -E ./deploy.sh
 
       - name: Deploy to EC2 frontend
         uses: appleboy/ssh-action@v1.2.2
