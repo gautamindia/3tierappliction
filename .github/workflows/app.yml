@@ -53,8 +53,12 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             REPO_URL=${{secrets.REPO_URL}}
             EOF
+            
             chmod 600 /opt/app/backend/.env
             cd /opt/app/backend
+            set -a
+            source .env
+            set +a
             sudo chmod +x deploy.sh
             ./deploy.sh
 
@@ -72,5 +76,8 @@ jobs:
             EOF
             chmod 600 /opt/app/frontend/.env
             cd /opt/app/frontend
+            set -a
+            source .env
+            set +a
             sudo chmod +x deploy.sh
             ./deploy.sh
