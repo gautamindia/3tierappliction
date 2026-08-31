@@ -25,6 +25,7 @@ jobs:
       # -----------------------------
       - name: Load Terraform outputs
         run: |
+          <<EOF
           DB_PORT=$(jq -r '.db_port.value' terraform-outputs.json)
           DB_HOST=$(jq -r '.db_host.value' terraform-outputs.json)
           BACKEND_PRIVATE_IP=$(jq -r '.backend_private_ip.value' terraform-outputs.json)
@@ -36,6 +37,7 @@ jobs:
           echo "BACKEND_PRIVATE_IP=$BACKEND_PRIVATE_IP" >> "$GITHUB_ENV"
           echo "BACKEND_PUBLIC_IP=$BACKEND_PUBLIC_IP" >> "$GITHUB_ENV"
           echo "FRONTEND_PUBLIC_IP=$FRONTEND_PUBLIC_IP" >> "$GITHUB_ENV"
+          EOF
 
 
       - name: Deploy to EC2 backend
