@@ -8,21 +8,14 @@ REPO_URL="${REPO_URL:?REPO_URL env var required}"
 REPO_REF="${REPO_REF:-main}"
 APP_DIR=/opt/app/backend
 
-if [ ! -d "$APP_DIR/.git" ]; then
-  sudo mkdir -p "$APP_DIR"
-  sudo chown ec2-user:ec2-user "$APP_DIR"
-  git clone "$REPO_URL" /tmp/repo-backend
-  cp -r /tmp/repo-backend/app/backend/. "$APP_DIR"
-  rm -rf /tmp/repo-backend
-  cd "$APP_DIR"
-  git init -q
-fi
+sudo mkdir -p "$APP_DIR"
+sudo chown ec2-user:ec2-user "$APP_DIR"
 
-cd "$APP_DIR"
 TMP_CLONE=$(mktemp -d)
+trap 'rm -rf "$TMP_CLONE"' EXIT   # cleans up even if the script fails partway
+
 git clone --depth 1 --branch "$REPO_REF" "$REPO_URL" "$TMP_CLONE"
 rsync -a --delete --exclude '.env' --exclude 'venv' "$TMP_CLONE/app/backend/" "$APP_DIR/"
-rm -rf "$TMP_CLONE"
 
 python3 -m venv "$APP_DIR/venv" --clear
 "$APP_DIR/venv/bin/pip" install --upgrade pip
