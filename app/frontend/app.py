@@ -1,6 +1,6 @@
 """
 Frontend tier - renders a simple UI, talks ONLY to the backend tier's HTTP API.
-Never talks to the database dkkdqqq directly.
+Never talks to theee database dkkdqqq directly.
 """
 import os
 import logging
