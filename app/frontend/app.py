@@ -1,5 +1,5 @@
 """
-Frontend tier - renders a simple UI, talks ONLY to the backend tier's HTTP API.
+Frontend ssstier - renders a simple UI, talks ONLY to the backend tier's HTTP API.
 Never talks to theee databasedd dkkdqqq directly.
 """
 import os
