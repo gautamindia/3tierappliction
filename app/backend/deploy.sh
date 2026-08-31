@@ -1,26 +1,65 @@
 #!/bin/bash
-# First-boot bootstrap for the backend instance. Installs base packages and
-# does an initial checkout/deploy. Subsequent deploys are done by the
-# app-deploy CI/CD pipeline via SSM Run Command (see app/backend/deploy.sh),
-# NOT by re-running this script.
+
 set -euo pipefail
 
-dnf install -y git python3 python3-pip rsync
+REPO_URL="${REPO_URL:?REPO_URL env var required}"
+REPO_REF="${REPO_REF:-main}"
 
-mkdir -p /opt/app/backend
-chown ec2-user:ec2-user /opt/app/backend
+APP_DIR="/opt/app/backend"
 
+echo "Starting backend deployment..."
 
+# Make sure application directory exists
+sudo mkdir -p "$APP_DIR"
 
-sudo -u ec2-user git clone "${repo_url}" /tmp/repo-backend
-cp -r /tmp/repo-backend/app/backend/. /opt/app/backend/
-rm -rf /tmp/repo-backend
+# Make ec2-user the owner so rsync can write files
+sudo chown -R ec2-user:ec2-user "$APP_DIR"
 
-sudo -u ec2-user python3 -m venv /opt/app/backend/venv
-sudo -u ec2-user /opt/app/backend/venv/bin/pip install --upgrade pip
-sudo -u ec2-user /opt/app/backend/venv/bin/pip install -r /opt/app/backend/requirements.txt
+# Create temporary clone directory
+TMP_CLONE=$(mktemp -d)
 
-cp /opt/app/backend/backend.service /etc/systemd/system/backend.service
-systemctl daemon-reload
-systemctl enable backend
-systemctl start backend
+# Always clean up temporary directory
+trap 'rm -rf "$TMP_CLONE"' EXIT
+
+echo "Cloning repository..."
+
+git clone \
+  --depth 1 \
+  --branch "$REPO_REF" \
+  "$REPO_URL" \
+  "$TMP_CLONE"
+
+echo "Copying backend files..."
+
+rsync -a \
+  --delete \
+  --exclude '.env' \
+  --exclude 'venv' \
+  "$TMP_CLONE/app/backend/" \
+  "$APP_DIR/"
+
+# Make deployment script executable
+chmod +x "$APP_DIR/deploy.sh"
+
+echo "Installing Python dependencies..."
+
+python3 -m venv "$APP_DIR/venv" --clear
+
+"$APP_DIR/venv/bin/pip" install --upgrade pip
+
+"$APP_DIR/venv/bin/pip" install \
+  -r "$APP_DIR/requirements.txt"
+
+echo "Installing systemd service..."
+
+sudo cp \
+  "$APP_DIR/backend.service" \
+  /etc/systemd/system/backend.service
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable backend
+
+sudo systemctl restart backend
+
+echo "Backend deployed and restarted successfully."
