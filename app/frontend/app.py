@@ -1,5 +1,5 @@
 """
-Frontend sssssstier -dddd renaaaders a sFFFimple UI, talks OaaaNLY to the backend tier's HTTP API.
+Frontend sssssstier -dddd renaaaders a sFFFimple UI, talks OaaaNLY to tSSShe backend tier's HTTP API.
 Nevaaaer taggglks to theee databasedd dkkdqqq sssdirectssslFFFydddaabbVVV.
 """
 import os
