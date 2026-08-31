@@ -34,7 +34,7 @@ echo "== Setting up app directory =="
 mkdir -p "$APP_DIR"
 chown ec2-user:ec2-user "$APP_DIR"
 
-echo "== Writing .env (kept separate from the code, never overwritten by deploys) =="
+echo "== Writing .env (kept separatess from the code, never overwritten by deploys) =="
 cat > "$APP_DIR/.env" << ENVEOF
 DB_HOST=$DB_HOST
 DB_PORT=$DB_PORT
