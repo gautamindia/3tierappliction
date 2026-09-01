@@ -48,7 +48,7 @@ jobs:
           script: |
             sudo mkdir -p /opt/app/backend/
             sudo touch /opt/app/backend/.env
-            sudo cat > /opt/app/backend/.env <<EOF
+            sudo tee /opt/app/backend/.env > /dev/null <<EOF
             DB_HOST=${{ env.DB_HOST }}
             DB_PORT=${{env.DB_PORT}}
             DB_USER=${{ secrets.DB_USER }}
@@ -85,7 +85,7 @@ jobs:
           script: |
             sudo mkdir -p /opt/app/frontend/
             sudo touch /opt/app/frontend/.env
-            sudo cat > /opt/app/frontend/.env <<EOF
+            sudo tee /opt/app/frontend/.env > /dev/null <<EOF
             BACKEND_PRIVATE_IP=${{env.BACKEND_PRIVATE_IP}}
             FLASK_SECRET_KEY=${{secrets.FLASK_SECRET_KEY}}
             REPO_URL=${{secrets.REPO_URL}}
