@@ -1,5 +1,5 @@
 """
-Frondddfftensssdee sssssstsssssieddddddddrddd -dddd rfffenaaaders a sFFFimple UI, talks OaaaNLY to tSSShe backend tier's HTTP API.
+Frondddfftensssdeesss sssssstsssssieddddddddrddd -dddd rfffenaaaders a sFFFimple UI, talks OaaaNLY to tSSShe backend tier's HTTP API.
 Nevaaaer taggglks to thdddeee databaddddsedd dkkdqqq sssdirectssslFFFydddaabbVVV.
 """
 import os
