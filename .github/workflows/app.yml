@@ -43,7 +43,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.BACKEND_PUBLIC_IP}}
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo mkdir -p /opt/app/backend/
@@ -80,7 +80,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.FRONTEND_PUBLIC_IP}}
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo mkdir -p /opt/app/frontend/
