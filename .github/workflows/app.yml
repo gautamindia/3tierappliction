@@ -46,6 +46,8 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            sudo mkdir -p /opt/app/backend/
+            sudo touch /opt/app/backend/.env
             cat > /opt/app/backend/.env <<EOF
             DB_HOST=${{ env.DB_HOST }}
             DB_PORT=${{env.DB_PORT}}
@@ -58,19 +60,19 @@ jobs:
             chmod 600 /opt/app/backend/.env
             sudo dnf update -y
             sudo dnf install -y python3 python3-pip git
-            git clone https://github.com/gautamindia/3tierappliction.git
-            cp -f /home/ec2-user/3tierappliction/app/backend/requirements.txt /opt/app/backend/requirements.txt
-            cp -f /home/ec2-user/3tierappliction/app/backend/app.py /opt/app/backend/app.py
-            rm -rf 3tierappliction
+            sudo git clone https://github.com/gautamindia/3tierappliction.git
+            sudo cp -f /home/ec2-user/3tierappliction/app/backend/requirements.txt /opt/app/backend/requirements.txt
+            sudo cp -f /home/ec2-user/3tierappliction/app/backend/app.py /opt/app/backend/app.py
+            sudo rm -rf 3tierappliction
             cd /opt/app/backend
             set -a
             source .env
             set +a
           
             
-            python3 -m venv venv
+            sudo python3 -m venv venv
             source venv/bin/activate
-            pip install -r requirements.txt
+            sudo pip install -r requirements.txt
             python3 app.py 
             EOF 
 
@@ -81,6 +83,8 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            sudo mkdir -p /opt/app/frontend/
+            sudo touch /opt/app/frontend/.env
             cat > /opt/app/frontend/.env <<EOF
             BACKEND_PRIVATE_IP=${{env.BACKEND_PRIVATE_IP}}
             FLASK_SECRET_KEY=${{secrets.FLASK_SECRET_KEY}}
@@ -90,17 +94,17 @@ jobs:
             chmod 600 /opt/app/frontend/.env
             sudo dnf update -y
             sudo dnf install -y python3 python3-pip git
-            git clone https://github.com/gautamindia/3tierappliction.git
-            cp -f /home/ec2-user/3tierappliction/app/frontend/requirements.txt /opt/app/frontend/requirements.txt
-            cp -f /home/ec2-user/3tierappliction/app/frontend/app.py /opt/app/frontend/app.py
-            cp -f /home/ec2-user/3tierappliction/app/frontend/templates/index.html /opt/app/frontend/templates/index.html
-            rm -rf 3tierappliction
+            sudo git clone https://github.com/gautamindia/3tierappliction.git
+            sudo cp -f /home/ec2-user/3tierappliction/app/frontend/requirements.txt /opt/app/frontend/requirements.txt
+            sudo cp -f /home/ec2-user/3tierappliction/app/frontend/app.py /opt/app/frontend/app.py
+            sudo cp -f /home/ec2-user/3tierappliction/app/frontend/templates/index.html /opt/app/frontend/templates/index.html
+            sudo rm -rf 3tierappliction
             cd /opt/app/frontend
             set -a
             source .env
             set +a
-            python3 -m venv venv
+            sudo python3 -m venv venv
             source venv/bin/activate
-            pip install -r requirements.txt
+            sudo pip install -r requirements.txt
             python3 app.py
             EOF
