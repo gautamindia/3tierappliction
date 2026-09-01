@@ -6,7 +6,7 @@ resource "aws_instance" "this" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = var.vpc_security_group_ids
   associate_public_ip_address = var.associate_public_ip
-  iam_instance_profile        = aws_iam_instance_profile.this.name
+  
   key_name                    = var.key_name
   user_data                   = var.user_data
 
